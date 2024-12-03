@@ -1,3 +1,4 @@
+#include "fdf.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "minilibx-linux/mlx.h"

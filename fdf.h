@@ -2,6 +2,15 @@
 # define FDF_H
 # include <stdlib.h>
 
+# define height 900
+# define width 600
+
+typedef struct s_window
+{
+	void *ptr;
+	void *win;
+}	t_window;
+
 typedef struct s_ponto
 {
     int altura;

@@ -5,43 +5,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
-int	count_x(char	*str)
-{
-	int	i;
-	int	count;
-
-	i = 0;
-	count = 0;
-	while (str[i])
-	{
-		if (str[i] != ' ')
-			count++;
-		while (str[i] != ' ' && str[i] != '\0')
-			i++;
-		if (str[i] != '\0')
-			i++;
-	}
-	return (count);
-}
-
-int	count_y(int	fd)
-{
-	char	*line;
-	int	i;
-	
-	i = 0;
-	line = get_next_line(fd);
-	while (line != NULL)
-	{	
-		free(line);
-		line = get_next_line(fd);
-		i++;
-	}
-	close(fd);
-	return (i + 1);
-}
-
-void map_error(t_matriz *ptr, int i, char *line)
+void	map_error(t_matriz *ptr, int i, char *line)
 {
 	int	j;
 
@@ -53,49 +17,59 @@ void map_error(t_matriz *ptr, int i, char *line)
 	return ;
 }
 
-t_ponto	*mapa_line(char	*line, int x)
+void	populate(t_ponto *linem, char **color_hex, char **num, int x)
 {
-	char	**num;
-	char    **color_hex;
-	t_ponto	*linem;
 	int	i;
-	
+	int	k;
+
 	i = 0;
-	num = ft_split(line, ' ');
-	if (num == NULL)
-	    return (NULL);
-	linem = malloc(sizeof(t_ponto) * x);
-	if (linem == NULL)
+	while (num[i] != NULL && i < x)
 	{
-		free (num);
-	    return (NULL);
-	}
-	while  (num[i] != NULL && i < x)
-	{
+		k = -1;
 		linem[i].altura = ft_atoi(num[i]);
 		color_hex = ft_split(num[i], ',');
 		if (color_hex != NULL && color_hex[1] != NULL)
 			linem[i].cor = convert_base(color_hex[1]);
 		else
-		    linem[i].cor = convert_base("0xFFFFFF");
+			linem[i].cor = convert_base("0xFFFFFF");
 		free(num[i]);
-        free(color_hex[0]);
-		free(color_hex[1]);
+		while (color_hex[++k] != NULL)
+			free(color_hex[k]);
+		free (color_hex);
 		i++;
 	}
-	free (color_hex);
 	free (num[i]);
 	free(num);
+}
+
+t_ponto	*mapa_line(char	*line, int x)
+{
+	char	**num;
+	char	**color_hex;
+	t_ponto	*linem;
+	int		i;
+
+	i = 0;
+	color_hex = NULL;
+	num = ft_split(line, ' ');
+	if (num == NULL)
+		return (NULL);
+	linem = malloc(sizeof(t_ponto) * x);
+	if (linem == NULL)
+	{
+		free (num);
+		return (NULL);
+	}
+	populate(linem, color_hex, num, x);
 	return (linem);
 }
 
 void	creat_matriz(t_matriz *ptr, int fd)
 {
 	char	*line;
-	int	i;
-	
-	ptr->mapa = (t_ponto **)malloc(sizeof(t_ponto *) * ptr->y);
+	int		i;
 
+	ptr->mapa = (t_ponto **)malloc(sizeof(t_ponto *) * ptr->y);
 	if (ptr->mapa == NULL)
 		return ;
 	line = get_next_line(fd);
