@@ -5,6 +5,56 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
+
+long int convert_base(char *s)
+{
+    int i;
+    long int content;
+
+    i = 0;
+	content = 0;
+    if (s[0] == '0' && s[1] == 'x')
+        i = 2;
+
+    while (s[i] != '\0' && s[i] != '\n')
+    {
+        content *= 16;
+        if (s[i] >= '0' && s[i] <= '9')
+            content += (s[i] - '0');
+        else if (s[i] >= 'A' && s[i] <= 'F')
+            content += (s[i] - 'A' + 10);
+        else if (s[i] >= 'a' && s[i] <= 'f')
+            content += (s[i] - 'a' + 10);
+        else
+        {
+            printf("Erro na conversão: caractere inválido\n");
+            return (16777215);
+        }
+        i++;
+    }
+
+    return (content);
+}
+
+void	free_matriz(t_matriz	*ptr)
+{
+	int	i;
+
+	i = -1;
+	if (ptr == NULL)
+		return ;
+	if (ptr->mapa)
+	{
+		while (++i < ptr->y)
+		{
+			if (ptr->mapa[i] != NULL)
+				free(ptr->mapa[i]);
+		}
+		free(ptr->mapa);
+	}
+	free(ptr);
+}
+
 void	print(t_matriz *ptr)
 {
 	int    i;
@@ -16,7 +66,7 @@ void	print(t_matriz *ptr)
 	{
 		while (k < ptr->x)
 		{
-			printf("%d ", ptr->mapa[i][k]);
+			printf("Altura: %d, Cor: 0x%06lX\n", ptr->mapa[i][k].altura, ptr->mapa[i][k].cor);
 			k++;
 		}
 		printf("\n");
@@ -24,31 +74,32 @@ void	print(t_matriz *ptr)
 		i++;
 	}
 }
-int	main()
-{
-	int	fd;
-	char	*line;
-	t_matriz	*ptr;
 
-    fd = open("test_maps/julia.fdf", O_RDONLY);
-	if (fd < 0)
-	    return (-1);
-	ptr  = malloc(sizeof(t_matriz));
-	if (ptr == NULL)
-		return (-1);
-	line = get_next_line(fd);
-	ptr->x = count_x(line);
-	ptr->y = count_y(fd);
-	close(fd);
-	fd = open("test_maps/julia.fdf", O_RDONLY);
-	if (fd < 0)
+	int	main()
 	{
-		free(ptr);
-	    return (-1);
-	}
-	creat_matriz(ptr, fd);
-	print(ptr);
-	free_matriz(ptr);
-	free(line);
-	close(fd);
-}
+		int	fd;
+		char	*line;
+		t_matriz	*ptr;
+
+		fd = open("test2.txt", O_RDONLY);
+		if (fd < 0)
+			return (-1);
+		ptr  = malloc(sizeof(t_matriz));
+		if (ptr == NULL)
+			return (-1);
+		line = get_next_line(fd);
+		ptr->x = count_x(line);
+		ptr->y = count_y(fd);
+		close(fd);
+		fd = open("test2.txt", O_RDONLY);
+		if (fd < 0)
+		{
+			free(ptr);
+			return (-1);
+		}
+		creat_matriz(ptr, fd);
+		print(ptr);
+		free_matriz(ptr);
+		free(line);
+		close(fd);
+	}	

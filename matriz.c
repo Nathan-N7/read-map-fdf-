@@ -38,47 +38,53 @@ int	count_y(int	fd)
 		i++;
 	}
 	close(fd);
-	return (i);
+	return (i + 1);
 }
 
-void	free_matriz(t_matriz	*ptr)
+void map_error(t_matriz *ptr, int i, char *line)
 {
-	int	i;
+	int	j;
 
-	i = -1;
-	if (ptr == NULL)
-		return ;
-	if (ptr->mapa)
-	{
-		while (++i < ptr->y)
-		{
-			if (ptr->mapa[i] != NULL)
-				free(ptr->mapa[i]);
-		}
-		free(ptr->mapa);
-	}
-	free(ptr);
+	j = 0;
+	free(line);
+	while (j < i)
+		free(ptr->mapa[j++]);
+	free(ptr->mapa);
+	return ;
 }
 
-int	*mapa_line(char	*line, int x)
+t_ponto	*mapa_line(char	*line, int x)
 {
 	char	**num;
-	int	*linem;
+	char    **color_hex;
+	t_ponto	*linem;
 	int	i;
 	
 	i = 0;
 	num = ft_split(line, ' ');
 	if (num == NULL)
 	    return (NULL);
-	linem = malloc(sizeof(int) * x);
+	linem = malloc(sizeof(t_ponto) * x);
 	if (linem == NULL)
-	    return (NULL);
-	while  (num[i] != NULL)
 	{
-		linem[i] = ft_atoi(num[i]);
+		free (num);
+	    return (NULL);
+	}
+	while  (num[i] != NULL && i < x)
+	{
+		linem[i].altura = ft_atoi(num[i]);
+		color_hex = ft_split(num[i], ',');
+		if (color_hex != NULL && color_hex[1] != NULL)
+			linem[i].cor = convert_base(color_hex[1]);
+		else
+		    linem[i].cor = convert_base("0xFFFFFF");
 		free(num[i]);
+        free(color_hex[0]);
+		free(color_hex[1]);
 		i++;
 	}
+	free (color_hex);
+	free (num[i]);
 	free(num);
 	return (linem);
 }
@@ -87,27 +93,20 @@ void	creat_matriz(t_matriz *ptr, int fd)
 {
 	char	*line;
 	int	i;
-	int    j;
 	
-	ptr->mapa = (int **)malloc(sizeof(int *) * ptr->y);
+	ptr->mapa = (t_ponto **)malloc(sizeof(t_ponto *) * ptr->y);
+
 	if (ptr->mapa == NULL)
 		return ;
 	line = get_next_line(fd);
 	i = 0;
-	j = 0;
 	while (line != NULL)
 	{
 		if (i < ptr->y)
 		{
 			ptr->mapa[i] = mapa_line(line, ptr->x);
 			if (ptr->mapa[i] == NULL)
-			{
-				free(line);
-				while (j < i)
-					free(ptr->mapa[j++]);
-				free(ptr->mapa);
-				return ;
-			}
+				map_error(ptr, i, line);
 		}
 		free (line);
 		line = get_next_line(fd);

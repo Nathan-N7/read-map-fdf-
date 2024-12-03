@@ -22,6 +22,13 @@ int button_press(int keysym, t_window *mlx)
 	return (0);
 }
 
+int	render (t_window *mlx)
+{
+	if (mlx->win != NULL)
+		mlx_pixel_put(mlx->ptr, mlx->win, 900 / 2, 600 / 2, 0xFF0000);
+	return (0);
+}
+
 int event_close(t_window *mlx)
 {
 	mlx_destroy_window(mlx->ptr, mlx->win);
@@ -39,5 +46,6 @@ int main()
 
 	mlx_key_hook(mlx.win, button_press, &mlx);
 	mlx_hook(mlx.win, 17, 0, event_close, &mlx);
+	mlx_loop_hook(mlx.ptr, &render, &mlx);
 	mlx_loop(mlx.ptr);
 }
