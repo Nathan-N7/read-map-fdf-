@@ -31,7 +31,7 @@ void	populate(t_ponto *linem, char **color_hex, char **num, int x)
 		if (color_hex != NULL && color_hex[1] != NULL)
 			linem[i].cor = convert_base(color_hex[1]);
 		else
-			linem[i].cor = convert_base("0xFFFFFF");
+			linem[i].cor = convert_base("0xAAAAAA");
 		free(num[i]);
 		while (color_hex[++k] != NULL)
 			free(color_hex[k]);

@@ -1,0 +1,1 @@
+ccc matriz.c main.c libft/libft.a gnl/get_next_line.a minilibx-linux/libmlx_Linux.a window.c -Lminilibx-linux -lmlx_Linux -lX11 -lXext -lm
